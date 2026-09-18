@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In · GIPS Alumni Meet 2026</title>
+  <link rel="icon" href="assets/logo.png" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-card">
+      <div class="auth-brand"><img class="gips-logo" src="assets/logo.png" alt="GIPS crest" /><div><strong>GIPS</strong><span>Alumni Meet 2026</span></div></div>
+      <p class="auth-kicker">Private member portal</p>
+      <h1 class="serif auth-title">Welcome back.</h1>
+      <p class="auth-copy">Sign in with your approved school account to continue.</p>
+      <form id="login-form" class="auth-form">
+        <label>Email<input id="login-email" type="email" autocomplete="email" required /></label>
+        <label>Password<div class="password-field"><input id="login-password" type="password" autocomplete="current-password" required /><button id="toggle-password" type="button" aria-label="Show or hide password"><i data-lucide="eye"></i></button></div></label>
+        <button id="login-submit" class="btn btn-primary" type="submit">Sign in</button>
+        <p id="login-status" class="auth-status" role="alert"></p>
+      </form>
+    </section>
+  </main>
+  <script src="assets/lucide.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", () => lucide.createIcons());</script>
+</body>
+</html>
