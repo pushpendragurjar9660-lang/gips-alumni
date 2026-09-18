@@ -57,14 +57,20 @@ async function refreshAuthSession(session) {
 }
 
 async function loadAuthProfile(session) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id,name,email,photo_url,role,created_at&id=eq.${encodeURIComponent(session.user.id)}`, { headers: authHeaders() });
-  if (response.ok) {
-    const profiles = await response.json();
-    if (profiles[0]) return profiles[0];
-  }
+  const profileResponse = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id,name,email,photo_url,role,created_at&id=eq.${encodeURIComponent(session.user.id)}`, { headers: authHeaders() });
+  const profile = profileResponse.ok ? (await profileResponse.json())[0] : null;
 
   const adminResponse = await fetch(`${SUPABASE_URL}/rest/v1/admin_users?select=user_id&user_id=eq.${encodeURIComponent(session.user.id)}`, { headers: authHeaders() });
-  if (adminResponse.ok && (await adminResponse.json()).length) {
+  const isAdminAllowed = adminResponse.ok && (await adminResponse.json()).length > 0;
+
+  if (profile) {
+    if (profile.role === "admin" || isAdminAllowed) {
+      return { ...profile, role: "admin" };
+    }
+    return profile;
+  }
+
+  if (isAdminAllowed) {
     return { id: session.user.id, name: session.user.email?.split("@")[0] || "Admin", email: session.user.email, role: "admin", photo_url: "" };
   }
   return null;
@@ -134,6 +140,8 @@ function initPortalSidebar() {
 }
 
 async function loginWithPassword(email, password) {
+  clearAuthSession();
+
   const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
     method: "POST",
     headers: { apikey: SUPABASE_PUBLISHABLE_KEY, "Content-Type": "application/json" },
@@ -141,6 +149,12 @@ async function loginWithPassword(email, password) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.error_description || data.msg || "Invalid email or password.");
+
+  const previousSession = readAuthSession();
+  if (previousSession?.user?.id && previousSession.user.id !== data.user?.id) {
+    clearAuthSession();
+  }
+
   saveAuthSession(data);
   const profile = await loadAuthProfile(data);
   if (!profile) {
@@ -164,7 +178,7 @@ async function logoutUser() {
 async function resolveAuth() {
   let session = readAuthSession();
   if (!session) return null;
-  saveAuthSession(session);
+
   const userResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers: authHeaders() });
   if (!userResponse.ok) {
     session = await refreshAuthSession(session);
@@ -173,14 +187,22 @@ async function resolveAuth() {
       return null;
     }
   }
+
   const user = session.user || await (await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers: authHeaders() })).json();
-  if (!user?.id) return null;
-  window.AUTH_USER = user;
-  window.AUTH_PROFILE = await loadAuthProfile(session);
-  if (!window.AUTH_PROFILE) {
+  if (!user?.id) {
     clearAuthSession();
     return null;
   }
+
+  window.AUTH_USER = user;
+  const profile = await loadAuthProfile(session);
+  if (!profile) {
+    clearAuthSession();
+    return null;
+  }
+
+  window.AUTH_PROFILE = profile;
+  saveAuthSession(session);
   return session;
 }
 

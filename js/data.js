@@ -94,7 +94,7 @@ const DEPARTMENTS = [
           "Supports the department head in managing the event, coordinating teams and ensuring that major responsibilities are completed effectively.",
         performance: "Excellent",
         score: 99.0,
-        photo: "",
+        photo: "assets/rajvardhan.png",
       },
     ],
   },
@@ -153,6 +153,15 @@ const DEPARTMENTS = [
         score: 85,
         photo: "assets/harshita.png",
       },
+      {
+        name: "Harshit Gautam",
+        position: "Coordinator",
+        responsibility:
+          "Helps coordinate communication, task tracking and support for student activities during the event.",
+        performance: "Good",
+        score: 84,
+        photo: "",
+      },
     ],
   },
   {
@@ -174,7 +183,7 @@ const DEPARTMENTS = [
           "Responsible for developing the event website and implementing its main functionality and user interface.",
         performance: "Excellent",
         score: null,
-        photo: "",
+        photo: "assets/pushpendra.png",
       },
       {
         name: "Vansh",
@@ -183,7 +192,7 @@ const DEPARTMENTS = [
           "Supports website development, content presentation, interface improvements and technical implementation.",
         performance: "Very Good",
         score: null,
-        photo: "",
+        photo: "assets/vansh.png",
       },
     ],
   },
