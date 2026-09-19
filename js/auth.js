@@ -11,6 +11,7 @@ const PROTECTED_PAGES = new Set([
   "profile.html",
   "admin.html",
 ]);
+let portalSidebarInitialized = false;
 
 function currentPage() {
   return window.location.pathname.split("/").pop() || "index.html";
@@ -57,11 +58,17 @@ async function refreshAuthSession(session) {
 }
 
 async function loadAuthProfile(session) {
-  const profileResponse = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id,name,email,photo_url,role,created_at&id=eq.${encodeURIComponent(session.user.id)}`, { headers: authHeaders() });
-  const profile = profileResponse.ok ? (await profileResponse.json())[0] : null;
-
-  const adminResponse = await fetch(`${SUPABASE_URL}/rest/v1/admin_users?select=user_id&user_id=eq.${encodeURIComponent(session.user.id)}`, { headers: authHeaders() });
-  const isAdminAllowed = adminResponse.ok && (await adminResponse.json()).length > 0;
+  const userId = encodeURIComponent(session.user.id);
+  const [profileResponse, adminResponse] = await Promise.all([
+    fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id,name,email,photo_url,role,created_at&id=eq.${userId}`, { headers: authHeaders() }),
+    fetch(`${SUPABASE_URL}/rest/v1/admin_users?select=user_id&user_id=eq.${userId}`, { headers: authHeaders() }),
+  ]);
+  const [profiles, adminUsers] = await Promise.all([
+    profileResponse.ok ? profileResponse.json() : [],
+    adminResponse.ok ? adminResponse.json() : [],
+  ]);
+  const profile = profiles[0] || null;
+  const isAdminAllowed = adminUsers.length > 0;
 
   if (profile) {
     if (profile.role === "admin" || isAdminAllowed) {
@@ -100,6 +107,8 @@ function addPortalLink(nav, { href, label, iconName, key, adminOnly = false }) {
 }
 
 function initPortalSidebar() {
+  if (portalSidebarInitialized) return;
+  portalSidebarInitialized = true;
   const nav = document.querySelector(".side-nav-links");
   if (!nav) return;
   const brand = document.querySelector(".side-brand");

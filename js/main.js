@@ -85,7 +85,7 @@ function perfBadge(level, size = "md") {
 
 function avatar(name, photo, size = 56) {
   if (photo) {
-    return `<img class="avatar-photo" src="${photo}" alt="${name}" style="width:${size}px;height:${size}px" />`;
+    return `<img class="avatar-photo" src="${photo}" alt="${name}" loading="lazy" decoding="async" width="${size}" height="${size}" style="width:${size}px;height:${size}px" />`;
   }
   return `<div class="avatar-initials" style="width:${size}px;height:${size}px;font-size:${size * 0.34}px">${getInitials(name)}</div>`;
 }
@@ -124,7 +124,42 @@ function initNavbar() {
   if (sideEvent) sideEvent.textContent = EVENT.name;
   document.querySelectorAll(".gips-logo").forEach((img) => (img.src = LOGO_SRC));
 
-  const navbar = document.getElementById("navbar");
+  let navbar = document.getElementById("navbar");
+  if (!navbar) {
+    navbar = document.createElement("header");
+    navbar.id = "navbar";
+    navbar.className = "navbar";
+    navbar.innerHTML = `
+      <div class="nav-inner">
+        <div class="mobile-header-left">
+          <button id="mobile-toggle" class="mobile-toggle" type="button" aria-label="Open menu">${icon("menu", 26)}</button>
+          <a class="brand" href="index.html" aria-label="Go to home">
+            <img src="${LOGO_SRC}" alt="GIPS crest" />
+            <div class="brand-text">
+              <span class="brand-short">${SCHOOL.shortName}</span>
+              <span class="brand-event">${EVENT.name}</span>
+            </div>
+          </a>
+        </div>
+        <a id="mobile-back-home" class="mobile-back-home" href="index.html" aria-label="Back to home">${icon("arrow-left", 20)} Home</a>
+      </div>
+      <nav id="mobile-panel" class="mobile-panel" aria-label="Mobile navigation"></nav>
+    `;
+    document.body.insertBefore(navbar, document.body.firstChild);
+  }
+
+  const mobilePanel = document.getElementById("mobile-panel");
+  if (mobilePanel && !mobilePanel.querySelector("[data-nav]")) {
+    const mobileLinks = [...document.querySelectorAll(".side-nav-link")].map((link) => {
+      const clone = link.cloneNode(true);
+      clone.removeAttribute("hidden");
+      clone.classList.remove("active");
+      clone.setAttribute("data-mobile-link", "true");
+      return clone;
+    });
+    mobilePanel.append(...mobileLinks);
+  }
+
   const sideNav = document.getElementById("side-nav");
   let collapseTimer;
   if (sideNav) {
@@ -145,13 +180,23 @@ function initNavbar() {
   }
 
   const mobileToggle = document.getElementById("mobile-toggle");
-  const mobilePanel = document.getElementById("mobile-panel");
   if (mobileToggle && mobilePanel) {
-    mobileToggle.addEventListener("click", () => {
-      const open = mobilePanel.classList.toggle("open");
+    const syncMobileState = () => {
+      const open = mobilePanel.classList.contains("open");
       mobileToggle.innerHTML = open ? icon("x", 26) : icon("menu", 26);
       lucide.createIcons();
+    };
+    mobileToggle.addEventListener("click", () => {
+      mobilePanel.classList.toggle("open");
+      syncMobileState();
     });
+    mobilePanel.querySelectorAll("[data-nav]").forEach((link) => {
+      link.addEventListener("click", () => {
+        mobilePanel.classList.remove("open");
+        syncMobileState();
+      });
+    });
+    syncMobileState();
   }
 
   const currentPath = window.location.pathname.split("/").pop() || "index.html";
@@ -538,7 +583,7 @@ function applyDailyRecords(records) {
 }
 
 async function fetchDailyRecords() {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/daily_performance?select=*&order=performance_date.asc`, { headers: adminHeaders() });
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/daily_performance?select=member_key,daily_score,performance_date,attendance,remarks,member_name,department_id,department_name&order=performance_date.asc`, { headers: adminHeaders() });
   if (!response.ok) throw new Error("Daily performance records could not be loaded.");
   DAILY_RECORDS = await response.json();
   applyDailyRecords(DAILY_RECORDS);
@@ -621,7 +666,7 @@ function renderFreshDailyRows(records, date, loading = false) {
 }
 
 async function fetchRecordsForDate(date) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/daily_performance?select=*&performance_date=eq.${encodeURIComponent(date)}&order=member_name.asc`, { headers: adminHeaders() });
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/daily_performance?select=member_key,attendance,daily_score,remarks&performance_date=eq.${encodeURIComponent(date)}&order=member_key.asc`, { headers: adminHeaders() });
   if (!response.ok) throw new Error("Could not check saved records for this date.");
   return response.json();
 }
@@ -746,7 +791,10 @@ function initPublicAttendance() {
 
 async function init() {
   if (window.AUTH_READY && !(await window.AUTH_READY)) return;
-  try { await fetchDailyRecords(); } catch (error) { DAILY_RECORDS = []; }
+  const needsDailyRecords = document.getElementById("dept-grid") || document.getElementById("public-attendance-date");
+  if (needsDailyRecords) {
+    try { await fetchDailyRecords(); } catch (error) { DAILY_RECORDS = []; }
+  }
   const rankedDepts = computeRankedDepartments();
   ALL_RANKED_DEPTS = rankedDepts;
   const rankedMembers = computeRankedMembers(rankedDepts);

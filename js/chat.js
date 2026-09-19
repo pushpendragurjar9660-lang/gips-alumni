@@ -19,7 +19,7 @@ function renderChatMessages() {
   container.innerHTML = chatMessages.map((item) => {
     const own = item.sender_id === window.AUTH_USER.id;
     const sender = item.sender || { name: "Member", photo_url: "" };
-    const avatar = sender.photo_url ? `<img src="${escapeChatText(sender.photo_url)}" alt="" />` : `<span>${escapeChatText(sender.name).slice(0, 2).toUpperCase()}</span>`;
+    const avatar = sender.photo_url ? `<img src="${escapeChatText(sender.photo_url)}" alt="" loading="lazy" decoding="async" />` : `<span>${escapeChatText(sender.name).slice(0, 2).toUpperCase()}</span>`;
     const deleteButton = own || window.AUTH_PROFILE.role === "admin" ? `<button class="chat-delete" type="button" data-delete-message="${item.id}" aria-label="Delete message"><i data-lucide="trash-2"></i></button>` : "";
     return `<article class="chat-message ${own ? "own" : "other"}"><div class="chat-avatar">${avatar}</div><div class="chat-bubble"><div class="chat-message-meta"><strong>${escapeChatText(sender.name)}</strong><time>${chatTime(item.created_at)}</time>${deleteButton}</div><p>${escapeChatText(item.message).replace(/\n/g, "<br />")}</p></div></article>`;
   }).join("");
@@ -29,10 +29,12 @@ function renderChatMessages() {
 }
 
 async function loadChatHistory() {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/messages?select=id,sender_id,message,created_at&order=created_at.asc&limit=50`, { headers: authHeaders() });
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/messages?select=id,sender_id,message,created_at&order=created_at.desc&limit=50`, { headers: authHeaders() });
   if (!response.ok) throw new Error("Chat history could not be loaded.");
-  const messages = await response.json();
-  const profileResponse = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id,name,photo_url`, { headers: authHeaders() });
+  const messages = (await response.json()).reverse();
+  const senderIds = [...new Set(messages.map((message) => message.sender_id).filter(Boolean))];
+  const profileFilter = senderIds.length ? `&id=in.(${senderIds.map(encodeURIComponent).join(",")})` : "&id=eq.none";
+  const profileResponse = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id,name,photo_url${profileFilter}`, { headers: authHeaders() });
   const profiles = profileResponse.ok ? await profileResponse.json() : [];
   const byId = Object.fromEntries(profiles.map((profile) => [profile.id, profile]));
   chatMessages = messages.map((message) => ({ ...message, sender: byId[message.sender_id] }));

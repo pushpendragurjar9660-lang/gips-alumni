@@ -1,5 +1,20 @@
 let analyticsRecords = [];
 let analyticsChart = null;
+let chartLoadPromise;
+
+function ensureChartLoaded() {
+  if (window.Chart) return Promise.resolve();
+  if (chartLoadPromise) return chartLoadPromise;
+  chartLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js";
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("Performance chart could not be loaded."));
+    document.head.appendChild(script);
+  });
+  return chartLoadPromise;
+}
 
 function analyticsKey(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -49,7 +64,7 @@ function renderAnalyticsMembers(department, query = "") {
   lucide.createIcons();
 }
 
-function renderMemberDashboard(member, department, range = "all", customFrom = "", customTo = "") {
+async function renderMemberDashboard(member, department, range = "all", customFrom = "", customTo = "") {
   const departments = document.getElementById("analytics-departments");
   const members = document.getElementById("analytics-members");
   const dashboard = document.getElementById("member-dashboard");
@@ -70,8 +85,14 @@ function renderMemberDashboard(member, department, range = "all", customFrom = "
   document.getElementById("analytics-range").addEventListener("change", update);
   document.getElementById("analytics-from").addEventListener("change", update);
   document.getElementById("analytics-to").addEventListener("change", update);
-  analyticsChart?.destroy();
-  if (typeof Chart !== "undefined") analyticsChart = new Chart(document.getElementById("member-chart"), { type: "line", data: { labels: records.map((record) => record.performance_date), datasets: [{ label: "Saved daily score", data: scores, borderColor: "#1E3A8A", backgroundColor: "rgba(30,58,138,.12)", fill: true, tension: .3, pointRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100, title: { display: true, text: "Score / 100" } }, x: { title: { display: true, text: "Saved date" } } }, plugins: { tooltip: { callbacks: { label: (context) => `Saved score: ${context.parsed.y}/100` } } } } });
+  try {
+    await ensureChartLoaded();
+    analyticsChart?.destroy();
+    analyticsChart = new Chart(document.getElementById("member-chart"), { type: "line", data: { labels: records.map((record) => record.performance_date), datasets: [{ label: "Saved daily score", data: scores, borderColor: "#1E3A8A", backgroundColor: "rgba(30,58,138,.12)", fill: true, tension: .3, pointRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100, title: { display: true, text: "Score / 100" } }, x: { title: { display: true, text: "Saved date" } } }, plugins: { tooltip: { callbacks: { label: (context) => `Saved score: ${context.parsed.y}/100` } } } } });
+  } catch (error) {
+    const chart = document.getElementById("member-chart");
+    if (chart) chart.replaceWith(Object.assign(document.createElement("p"), { textContent: error.message }));
+  }
   lucide.createIcons();
 }
 
@@ -85,7 +106,7 @@ async function initAnalyticsModal() {
     modal.classList.add("analytics-modal-open");
     document.body.style.overflow = "";
     try {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/daily_performance?select=*&order=performance_date.asc`, { headers: authHeaders() });
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/daily_performance?select=member_key,performance_date,daily_score,attendance&order=performance_date.asc`, { headers: authHeaders() });
       analyticsRecords = response.ok ? await response.json() : [];
     } catch (error) {
       analyticsRecords = [];
