@@ -165,6 +165,52 @@ const DEPARTMENTS = [
     ],
   },
   {
+    id: "attendees",
+    name: "Attendee",
+    icon: "ticket",
+    isPlaceholder: false,
+    description:
+      "The attendee community that brings energy, participation, connection and enthusiasm to the event. Their presence and engagement help make the celebration vibrant and memorable.",
+    members: [
+      {
+        name: "Aarav Sharma",
+        position: "Attendee",
+        responsibility:
+          "Participates in the event experience, connects with classmates and contributes to the atmosphere of the celebration.",
+        performance: "Excellent",
+        score: 94,
+        photo: "",
+      },
+      {
+        name: "Diya Verma",
+        position: "Attendee",
+        responsibility:
+          "Engages with the event program, supports community participation and contributes to a lively celebration.",
+        performance: "Very Good",
+        score: 91,
+        photo: "",
+      },
+      {
+        name: "Karan Singh",
+        position: "Attendee",
+        responsibility:
+          "Acts as an active participant, helps build a welcoming atmosphere, and contributes to event engagement.",
+        performance: "Good",
+        score: 87,
+        photo: "",
+      },
+      {
+        name: "Meher Nair",
+        position: "Attendee",
+        responsibility:
+          "Supports the celebration through active participation, enthusiasm, and involvement in the event experience.",
+        performance: "Very Good",
+        score: 89,
+        photo: "",
+      },
+    ],
+  },
+  {
     id: "webpage-developers",
     name: "Webpage Developers",
     icon: "code-2",
@@ -219,6 +265,11 @@ const POSITION_INFO = [
     title: "Web Developer",
     icon: "code-2",
     text: "Responsible for creating and maintaining the digital experience of the event website.",
+  },
+  {
+    title: "Attendee",
+    icon: "ticket",
+    text: "Represents the event community, participates in the celebration and contributes to the shared spirit and engagement of the gathering.",
   },
   {
     title: "Team Member",

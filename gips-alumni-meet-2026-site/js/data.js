@@ -212,6 +212,11 @@ const POSITION_INFO = [
     text: "Responsible for creating and maintaining the digital experience of the event website.",
   },
   {
+    title: "Attendee",
+    icon: "ticket",
+    text: "Represents the event community, participates in the celebration and contributes to the shared spirit and engagement of the gathering.",
+  },
+  {
     title: "Team Member",
     icon: "user-check",
     text: "Responsible for completing assigned tasks and actively supporting the department.",
