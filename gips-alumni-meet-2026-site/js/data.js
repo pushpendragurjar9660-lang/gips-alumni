@@ -156,6 +156,106 @@ const DEPARTMENTS = [
     ],
   },
   {
+    id: "attendees",
+    name: "Attendee",
+    icon: "ticket",
+    isPlaceholder: false,
+    description:
+      "The attendee community that brings energy, participation, connection and enthusiasm to the event. Their presence and engagement help make the celebration vibrant and memorable.",
+    members: [
+      {
+        name: "Harshika Kushwah",
+        position: "Attendee",
+        responsibility:
+          "Participates in the event with enthusiasm, connects with alumni and helps create a lively and welcoming atmosphere.",
+        performance: "Excellent",
+        score: 96,
+        photo: "",
+      },
+      {
+        name: "Aditya Singh Tomar",
+        position: "Attendee",
+        responsibility:
+          "Engages with the celebration, supports community participation and contributes to the event's energy and spirit.",
+        performance: "Very Good",
+        score: 92,
+        photo: "",
+      },
+      {
+        name: "Ansh Chauhan",
+        position: "Attendee",
+        responsibility:
+          "Acts as an active participant, helps build a welcoming atmosphere and contributes to event engagement.",
+        performance: "Very Good",
+        score: 91,
+        photo: "",
+      },
+      {
+        name: "Avdesh Singh",
+        position: "Attendee",
+        responsibility:
+          "Supports the celebration through active participation, enthusiasm and involvement in the event experience.",
+        performance: "Good",
+        score: 88,
+        photo: "",
+      },
+      {
+        name: "Ayushi Katare",
+        position: "Attendee",
+        responsibility:
+          "Brings positive energy to the gathering, interacts with peers and strengthens the celebratory spirit of the meet.",
+        performance: "Excellent",
+        score: 95,
+        photo: "",
+      },
+      {
+        name: "Mantasha Khan",
+        position: "Attendee",
+        responsibility:
+          "Participates in the event experience, helps create a warm environment and contributes to the shared excitement of the reunion.",
+        performance: "Good",
+        score: 87,
+        photo: "",
+      },
+      {
+        name: "Rajeev Raj",
+        position: "Attendee",
+        responsibility:
+          "Connects with the alumni community, supports participation and adds to the enthusiasm of the gathering.",
+        performance: "Very Good",
+        score: 90,
+        photo: "",
+      },
+      {
+        name: "Sachin Gurjar",
+        position: "Attendee",
+        responsibility:
+          "Contributes to the event atmosphere through active involvement, social engagement and positive participation.",
+        performance: "Good",
+        score: 86,
+        photo: "",
+      },
+      {
+        name: "Suhani Pal",
+        position: "Attendee",
+        responsibility:
+          "Supports a lively and inclusive event experience by participating actively and encouraging community connection.",
+        performance: "Excellent",
+        score: 94,
+        photo: "",
+      },
+      {
+        name: "Tanishka Chauhan",
+        position: "Attendee",
+        responsibility:
+          "Helps create a memorable celebration through participation, engagement and a friendly presence throughout the event.",
+        performance: "Very Good",
+        score: 93,
+        photo: "",
+      },
+    ],
+  },
+  {
     id: "webpage-developers",
     name: "Webpage Developers",
     icon: "code-2",

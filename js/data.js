@@ -160,7 +160,7 @@ const DEPARTMENTS = [
           "Helps coordinate communication, task tracking and support for student activities during the event.",
         performance: "Good",
         score: 84,
-        photo: "",
+        photo: "assets/harshit.png",
       },
     ],
   },
@@ -254,7 +254,7 @@ const DEPARTMENTS = [
         photo: "",
       },
       {
-        name: "Tanishka Chauhan",
+        name: "Tanushka Chauhan",
         position: "Attendee",
         responsibility:
           "Helps create a memorable celebration through participation, engagement and a friendly presence throughout the event.",
