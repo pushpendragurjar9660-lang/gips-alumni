@@ -118,15 +118,6 @@ const DEPARTMENTS = [
         photo: "assets/aafaz.png",
       },
       {
-        name: "Bheem",
-        position: "Coordinator",
-        responsibility:
-          "Helps coordinate students, communicate tasks and support smooth execution of event activities.",
-        performance: "Very Good",
-        score: 89,
-        photo: "assets/bheem.png",
-      },
-      {
         name: "Saniya",
         position: "Coordinator",
         responsibility:
@@ -187,7 +178,7 @@ const DEPARTMENTS = [
         position: "Creative & Design Lead",
         responsibility:
           "Plans social media content, develops creative and reel concepts, designs promotional and event content, suggests program design ideas, guides the visual and social-media presence, and proposes innovative ideas for events and reels.",
-        performance: "Good",
+        performance: "Needs Improvement",
         score: null,
         defaultScore: 0,
         photo: "assets/prachi.png",
@@ -218,15 +209,6 @@ const DEPARTMENTS = [
           "Engages with the celebration, supports community participation and contributes to the event's energy and spirit.",
         performance: "Very Good",
         score: 92,
-        photo: "",
-      },
-      {
-        name: "Ansh Chauhan",
-        position: "Attendee",
-        responsibility:
-          "Acts as an active participant, helps build a welcoming atmosphere and contributes to event engagement.",
-        performance: "Very Good",
-        score: 91,
         photo: "",
       },
       {

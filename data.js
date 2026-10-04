@@ -118,15 +118,6 @@ const DEPARTMENTS = [
         photo: "assets/aafaz.png",
       },
       {
-        name: "Bheem",
-        position: "Coordinator",
-        responsibility:
-          "Helps coordinate students, communicate tasks and support smooth execution of event activities.",
-        performance: "Very Good",
-        score: 89,
-        photo: "assets/bheem.png",
-      },
-      {
         name: "Saniya",
         position: "Coordinator",
         responsibility:

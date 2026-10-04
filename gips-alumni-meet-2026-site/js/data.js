@@ -118,15 +118,6 @@ const DEPARTMENTS = [
         photo: "assets/aafaz.png",
       },
       {
-        name: "Bheem",
-        position: "Coordinator",
-        responsibility:
-          "Helps coordinate students, communicate tasks and support smooth execution of event activities.",
-        performance: "Very Good",
-        score: 89,
-        photo: "assets/bheem.png",
-      },
-      {
         name: "Saniya",
         position: "Coordinator",
         responsibility:
@@ -179,15 +170,6 @@ const DEPARTMENTS = [
           "Engages with the celebration, supports community participation and contributes to the event's energy and spirit.",
         performance: "Very Good",
         score: 92,
-        photo: "",
-      },
-      {
-        name: "Ansh Chauhan",
-        position: "Attendee",
-        responsibility:
-          "Acts as an active participant, helps build a welcoming atmosphere and contributes to event engagement.",
-        performance: "Very Good",
-        score: 91,
         photo: "",
       },
       {
