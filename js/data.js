@@ -165,6 +165,36 @@ const DEPARTMENTS = [
     ],
   },
   {
+    id: "social-media-creative",
+    name: "Social Media & Creative Department",
+    icon: "clapperboard",
+    scored: false,
+    description:
+      "Creating engaging social media content, reels, designs and creative ideas to showcase the energy, memories and programs of GIPS Alumni Meet 2026.",
+    members: [
+      {
+        name: "Harshit Gautam",
+        position: "Reel Editor & Content Creator",
+        responsibility:
+          "Edits event and program reels, creates short-form video content, produces social media videos, and turns event footage into engaging reels.",
+        performance: "Good",
+        score: null,
+        photo: "assets/harshit.png",
+        secondaryAssignment: true,
+      },
+      {
+        name: "Prachi Rajput",
+        position: "Creative & Design Lead",
+        responsibility:
+          "Plans social media content, develops creative and reel concepts, designs promotional and event content, suggests program design ideas, guides the visual and social-media presence, and proposes innovative ideas for events and reels.",
+        performance: "Good",
+        score: null,
+        defaultScore: 0,
+        photo: "assets/prachi.png",
+      },
+    ],
+  },
+  {
     id: "attendees",
     name: "Attendee",
     icon: "ticket",

@@ -62,8 +62,9 @@ function computeRankedMembers(rankedDepts) {
   const all = [];
   rankedDepts.forEach((dept) => {
     dept.members.forEach((m) => {
-      if (typeof m.score === "number") {
-        all.push({ ...m, department: dept.name, departmentId: dept.id });
+      const score = typeof m.score === "number" ? m.score : m.defaultScore;
+      if (typeof score === "number" && !m.secondaryAssignment) {
+        all.push({ ...m, score, department: dept.name, departmentId: dept.id });
       }
     });
   });
@@ -565,13 +566,18 @@ let DAILY_RECORDS = [];
 let ADMIN_SESSION = window.AUTH_SESSION || null;
 
 function recordMemberKey(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+function primaryDepartmentMembers() {
+  return DEPARTMENTS.flatMap((department) => department.members
+    .filter((member) => !member.secondaryAssignment)
+    .map((member) => ({ ...member, departmentId: department.id, departmentName: department.name })));
+}
 function adminHeaders() { return { ...authHeaders(), Authorization: `Bearer ${ADMIN_SESSION?.access_token || window.AUTH_SESSION?.access_token || SUPABASE_PUBLISHABLE_KEY}` }; }
 function scorePerformance(score) { return score >= 95 ? "Excellent" : score >= 88 ? "Very Good" : score >= 75 ? "Good" : score >= 60 ? "Improving" : "Needs Improvement"; }
 function applyDailyRecords(records) {
   const grouped = {};
   DEPARTMENTS.forEach((dept) => dept.members.forEach((member) => {
-    member.score = null;
-    member.performance = "Needs Improvement";
+    member.score = typeof member.defaultScore === "number" ? member.defaultScore : null;
+    member.performance = typeof member.score === "number" ? scorePerformance(member.score) : "Needs Improvement";
   }));
   records.forEach((record) => { (grouped[record.member_key] ||= []).push(Number(record.daily_score)); });
   DEPARTMENTS.forEach((dept) => dept.members.forEach((member) => {
@@ -629,7 +635,7 @@ async function initAttendance() {
   const date = document.getElementById("performance-date");
   date.value = new Date().toISOString().slice(0, 10);
   try { await fetchDailyRecords(); } catch (error) { status.textContent = "Run supabase-setup.sql first."; }
-  const team = () => DEPARTMENTS.flatMap((dept) => dept.members.map((member) => ({ ...member, departmentId: dept.id, departmentName: dept.name })));
+  const team = () => primaryDepartmentMembers();
   const renderRows = () => { const today = DAILY_RECORDS.filter((record) => record.performance_date === date.value); const byKey = Object.fromEntries(today.map((record) => [record.member_key, record])); rows.innerHTML = team().map((member) => { const key = recordMemberKey(member.name); const record = byKey[key]; return `<tr data-member-key="${key}"><td><strong>${member.name}</strong><small>${member.departmentName}</small></td><td><input class="member-attendance" type="checkbox" ${record?.attendance ? "checked" : ""} /></td><td><input class="member-daily-score" type="number" min="0" max="100" step="0.1" value="${record?.daily_score ?? member.score ?? 0}" /></td><td><input class="member-remarks" maxlength="240" value="${record?.remarks || ""}" placeholder="Optional" /></td></tr>`; }).join(""); };
   renderRows();
   form.addEventListener("submit", async (event) => { event.preventDefault(); status.textContent = "Signing in..."; try { const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, { method: "POST", headers: { apikey: SUPABASE_PUBLISHABLE_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ email: document.getElementById("admin-email").value.trim(), password: document.getElementById("admin-password").value }) }); const data = await response.json(); if (!response.ok) throw new Error(data.error_description || "Invalid login."); const allowed = await fetch(`${SUPABASE_URL}/rest/v1/admin_users?select=user_id&user_id=eq.${data.user.id}`, { headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${data.access_token}` } }); if (!allowed.ok || !(await allowed.json()).length) throw new Error("This account is not an approved admin."); ADMIN_SESSION = { access_token: data.access_token, user: data.user }; form.hidden = true; content.hidden = false; document.getElementById("admin-session-label").textContent = data.user.email; } catch (error) { status.textContent = error.message; } });
@@ -639,12 +645,10 @@ async function initAttendance() {
 }
 
 function allDailyMembers() {
-  return DEPARTMENTS.flatMap((department) => department.members.map((member) => ({
+  return primaryDepartmentMembers().map((member) => ({
     ...member,
     memberKey: recordMemberKey(member.name),
-    departmentId: department.id,
-    departmentName: department.name,
-  })));
+  }));
 }
 
 function renderFreshDailyRows(records, date, loading = false) {
